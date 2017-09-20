@@ -18,7 +18,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     </db:generic-config>
     <context:property-placeholder location="${mule.env}.properties"/>
     <flow name="catalogus-deletesFlow">
-        <quartz:inbound-endpoint jobName="test" repeatInterval="18000000" startDelay="0" connector-ref="Quartz1" responseTimeout="10000" doc:name="Quartz">
+        <quartz:inbound-endpoint jobName="test" repeatInterval="3600000" startDelay="0" connector-ref="Quartz1" responseTimeout="10000" doc:name="Quartz">
             <quartz:event-generator-job groupName="test" jobGroupName="test"/>
         </quartz:inbound-endpoint>
         <logger message="Start getting all deleted items" level="INFO" doc:name="Logger"/>
