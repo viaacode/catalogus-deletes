@@ -18,16 +18,16 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     </db:generic-config>
     <context:property-placeholder location="${mule.env}.properties"/>
     <flow name="catalogus-deletesFlow">
-        <quartz:inbound-endpoint jobName="test" repeatInterval="3600000" startDelay="0" connector-ref="Quartz1" responseTimeout="10000" doc:name="Quartz">
+        <quartz:inbound-endpoint jobName="CatProDelete" repeatInterval="3600000" startDelay="0" connector-ref="Quartz1" responseTimeout="10000" doc:name="Quartz (1 hour)">
             <quartz:event-generator-job groupName="test" jobGroupName="test"/>
         </quartz:inbound-endpoint>
-        <logger message="Start getting all deleted items" level="INFO" doc:name="Logger"/>
+        <logger message="Get deleted items from MediaHaven" level="INFO" doc:name="Log: &quot;Get deleted items from MediaHaven&quot;"/>
         <db:select config-ref="Mediahaven_monitoring" doc:name="Get deleted items">
             <db:parameterized-query><![CDATA[select fragment_id, external_id pid
 from sips
 where organisation NOT IN ('viaa-archief', 'testbeeld', 'failures') and is_deleted != 0]]></db:parameterized-query>
         </db:select>
-        <logger message="Start inserting in bulk into deletes_temp" level="INFO" doc:name="Logger"/>
+        <logger message="Got #[payload.size()] deleted items. Start insert in bulk into deletes_temp." level="INFO" doc:name="Log: &quot;Got n deleted items. Start insert in bulk into deletes_temp.&quot;"/>
         <db:insert config-ref="Catalogus_pro" bulkMode="true" doc:name="Bulk insert into deletes_temp">
             <db:parameterized-query><![CDATA[INSERT INTO deletes_temp (
 	fragment_id,
@@ -36,7 +36,7 @@ VALUES(
 	#[payload['fragment_id']],
 	#[payload['pid']])]]></db:parameterized-query>
         </db:insert>
-        <logger message="Update items that are UNDELETED, but are now DELETED" level="INFO" doc:name="Logger"/>
+        <logger message="Update items that are UNDELETED, but are now DELETED" level="INFO" doc:name="Log: &quot;Update items that are UNDELETED, but are now DELETED&quot;"/>
         <db:update config-ref="Catalogus_pro" doc:name="Update items that are UNDELETED, but are now DELETED">
             <db:parameterized-query><![CDATA[update deletes
 set status = 'DELETED'
@@ -45,14 +45,14 @@ where status = 'UNDELETED' and fragment_id IN (
 	from deletes_temp
 )]]></db:parameterized-query>
         </db:update>
-        <logger message="Insert items that weren't already deleted, but are now DELETED" level="INFO" doc:name="Logger"/>
+        <logger message="Insert items that weren't already deleted, but are now DELETED" level="INFO" doc:name="Log: &quot;Insert items that weren't already deleted, but are now DELETED&quot;"/>
         <db:insert config-ref="Catalogus_pro" doc:name="Insert items that weren't already deleted, but are now DELETED">
             <db:parameterized-query><![CDATA[insert into deletes (fragment_id, pid, status)
 select fragment_id, pid, 'DELETED' status
 from deletes_temp
 where fragment_id NOT IN (select fragment_id from deletes)]]></db:parameterized-query>
         </db:insert>
-        <logger message="Update items that are DELETED to UNDELETED, but now undeleted because not available in the deleted list" level="INFO" doc:name="Logger"/>
+        <logger message="Update items that are DELETED to UNDELETED, but now undeleted because not available in the deleted list" level="INFO" doc:name="Log: &quot;Update items that are DELETED to UNDELETED, but ...&quot;"/>
         <db:update config-ref="Catalogus_pro" doc:name="Update items that are DELETED to UNDELETED, but now undeleted because not available in the deleted list">
             <db:parameterized-query><![CDATA[update deletes
 set status = 'UNDELETED'
@@ -61,11 +61,11 @@ where fragment_id NOT IN (
 	from deletes_temp
 )]]></db:parameterized-query>
         </db:update>
-        <logger message="Truncate deletes_temp" level="INFO" doc:name="Logger"/>
+        <logger message="Truncate deletes_temp" level="INFO" doc:name="Log: &quot;Truncate deletes_temp&quot;"/>
         <db:execute-ddl config-ref="Catalogus_pro" doc:name="Truncate deletes_temp">
             <db:dynamic-query><![CDATA[TRUNCATE deletes_temp;]]></db:dynamic-query>
         </db:execute-ddl>
-        <logger message="Done updating deletes" level="INFO" doc:name="Logger"/>
+        <logger message="Done updating deletes" level="INFO" doc:name="Log: &quot;Done updating deletes&quot;"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <db:execute-ddl config-ref="Catalogus_pro" doc:name="Truncate deletes_temp">
                 <db:dynamic-query><![CDATA[TRUNCATE deletes_temp;]]></db:dynamic-query>
