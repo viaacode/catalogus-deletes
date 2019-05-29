@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:context="http://www.springframework.org/schema/context" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:context="http://www.springframework.org/schema/context" xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,7 +8,8 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <quartz:connector name="Quartz1" validateConnections="true" doc:name="Quartz"/>
     <db:generic-config name="Mediahaven_monitoring" url="jdbc:postgresql://${mam.db.host}:${mam.db.port}/${mam.db.database}?password=${mam.db.password}&amp;user=${mam.db.username}" driverClassName="org.postgresql.Driver" doc:name="MH monitoring DB"> 
         <reconnect-forever></reconnect-forever>  
@@ -17,7 +18,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         <reconnect-forever></reconnect-forever>  
     </db:generic-config>
     <context:property-placeholder location="${mule.env}.properties"/>
-    <flow name="catalogus-deletesFlow">
+    <flow name="catalogus-deletesFlow" processingStrategy="synchronous">
         <quartz:inbound-endpoint jobName="CatProDelete" repeatInterval="3600000" startDelay="0" connector-ref="Quartz1" responseTimeout="10000" doc:name="Quartz (1 hour)">
             <quartz:event-generator-job groupName="test" jobGroupName="test"/>
         </quartz:inbound-endpoint>
