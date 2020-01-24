@@ -1,46 +1,92 @@
-staging.properties
-production.properties
-catalog
-mappings
-src/main/app/mule-app.properties
-src/test
-.DS_Store
+#######################################################################
+#
+#  Mule.gitignore
+#
+#  .gitignore template file for Mule projects within VIAA.
+#  
+#######################################################################
+
+# -------------------------------------------------- #
+# Custom additions, either project- or VIAA-specific #
+# -------------------------------------------------- #
+
+mule-app.sh
+
+# ------------------------------------------------------------------------------ #
 # Java defaults (https://github.com/github/gitignore/blob/master/Java.gitignore) #
-# --- #
+# ------------------------------------------------------------------------------ #
+# -----Package Files----- #
+    
 *.class
-# Package Files #
 *.jar
 *.war
 *.ear
-# --- #
+
+
+# ------------------------------------------------------------------------------------------- #
 # Eclipse-specific (https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore) #
-# --- #
-*.pydevproject
+# ------------------------------------------------------------------------------------------- #
+
 .metadata
-bin/**
-tmp/**
-tmp/**/*
+.settings/
+.loadpath
+*.pydevproject
 *.tmp
 *.bak
 *.swp
 *~.nib
-local.properties
-.settings/
-.loadpath
+bin/**
+tmp/**
+tmp/**/*
+
 # You may want to remove the sharp symbols here if you are using Maven
 .project
+.classpath
+
 # External tool builders
 .externalToolBuilders/
+
 # Locally stored "Eclipse launch configurations"
 *.launch
+
 # CDT-specific
 .cproject
+
 # PDT-specific
 .buildpath
+
+
 # --------------- #
 # Studio-specific #
 # --------------- #
+
 .studio/
 flows/
 target/
 **/*.mflow
+# Generated documentation
+assets/
+img/
+index.html
+
+
+# ------------- #
+# Mule-specific #
+# ------------- #
+
+staging.properties
+production.properties
+local.properties
+staging.y*ml
+production.y*ml
+local.y*ml
+catalog
+mappings
+src/main/app/mule-app.properties
+
+
+# -------------#
+# Mac-specific #
+# -------------#
+
+.DS_Store
